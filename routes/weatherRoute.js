@@ -11,7 +11,7 @@ let global=[];
 router.get('/', async (req, res) => {
     const city = req.query.city;
     const apiKey = process.env.apiKEY; // Your weather API key from .env file
-
+    console.log(city)
     try {
         
         const response = await axios.get(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`);
@@ -28,7 +28,8 @@ router.get('/', async (req, res) => {
             dateTime: currentDateTime
             
         });
-
+        
+        console.log(newWeatherData)
         global.push(newWeatherData)
         console.log(global)
         // await newWeatherData.save();
