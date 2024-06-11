@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
             dateTime: currentDateTime
             
         });
-        
+
         console.log(newWeatherData)
         global.push(newWeatherData)
         console.log(global)
@@ -90,5 +90,15 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Error saving weather data' });
     }
 });
+
+  //to get MongoDb Saved Data
+  router.get("/dbData",async (req,res)=>{
+    try {
+      const weatherData = await WeatherData.find();
+      res.status(200).json(weatherData);
+    } catch (error) {
+      res.status(500).json({ error: 'Error fetching books' });
+    }
+  })
 
 module.exports = router;
