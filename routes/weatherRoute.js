@@ -11,7 +11,8 @@ let global=[];
 router.get('/', async (req, res) => {
     const city = req.query.city;
     const apiKey = process.env.apiKEY; // Your weather API key from .env file
-    // console.log(city)
+    
+    // console.log(city,apiKey)
     try {
         
         const response = await axios.get(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`);
@@ -22,14 +23,14 @@ router.get('/', async (req, res) => {
         // Save weather data to MongoDB
         const newWeatherData = new WeatherData({
             city: weatherData.location.name,
+            country: weatherData.location.country,
             temperature: weatherData.current.temp_c,
             weatherCondition: weatherData.current.condition.text,
             humidity: weatherData.current.humidity,
             dateTime: currentDateTime
             
         });
-
-        // console.log(newWeatherData)
+         console.log(newWeatherData)
         global.push(newWeatherData)
         console.log(global)
         // await newWeatherData.save();
@@ -44,8 +45,8 @@ router.get('/', async (req, res) => {
 
 // POST route to save weather data to MongoDB
 router.post('/', async (req, res) => {
-    const city = req.body.city;
-    const apiKey = process.env.apiKEY; // Your weather API key from .env file
+    // const city = req.body.city;
+    // const apiKey = process.env.apiKEY; // Your weather API key from .env file
     // console.log(global)
     try {
         // const response = await axios.get(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`);
@@ -91,14 +92,31 @@ router.post('/', async (req, res) => {
     }
 });
 
-  //to get MongoDb Saved Data
-  router.get("/dbData",async (req,res)=>{
-    try {
-      const weatherData = await WeatherData.find();
-      res.status(200).json(weatherData);
-    } catch (error) {
-      res.status(500).json({ error: 'Error fetching books' });
-    }
-  })
 
+
+  //to get MongoDb Saved Data
+  router.get('/dbData', async (req, res) => {
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+    const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page if not provided
+  
+    try {
+      const weatherData = await WeatherData.find()
+        .skip((page - 1) * limit)
+        .limit(limit);
+  
+      const totalDocuments = await WeatherData.countDocuments();
+      const totalPages = Math.ceil(totalDocuments / limit);
+  
+      res.status(200).json({
+        data: weatherData,
+        currentPage: page,
+        totalPages: totalPages,
+        totalDocuments: totalDocuments
+      });
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      res.status(500).json({ error: 'Error fetching weather data' });
+    }
+  });
+  
 module.exports = router;
