@@ -11,13 +11,13 @@ let global=[];
 router.get('/', async (req, res) => {
     const city = req.query.city;
     const apiKey = process.env.apiKEY; // Your weather API key from .env file
-    console.log(city)
+    // console.log(city)
     try {
         
         const response = await axios.get(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`);
         const weatherData = response.data;
         // console.log(weatherData)
-        const currentDateTime = new Date().toLocaleString();
+        const currentDateTime = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 
         // Save weather data to MongoDB
         const newWeatherData = new WeatherData({
@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
             
         });
 
-        console.log(newWeatherData)
+        // console.log(newWeatherData)
         global.push(newWeatherData)
         console.log(global)
         // await newWeatherData.save();
