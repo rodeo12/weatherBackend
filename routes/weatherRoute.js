@@ -118,5 +118,17 @@ router.post('/', async (req, res) => {
       res.status(500).json({ error: 'Error fetching weather data' });
     }
   });
+
+    //to get MongoDB Saved Data in Charts form
+
+router.get("/chartData", async (req, res) => {
+  try {
+    const weatherData = await WeatherData.find();
+    res.status(200).json(weatherData);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching weather data' });
+  }
+});
+
   
 module.exports = router;
